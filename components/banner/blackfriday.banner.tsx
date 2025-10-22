@@ -1,3 +1,4 @@
+import { appName } from '@/lib/utils';
 
 const BlackFridayBanner = () => {
   return (
@@ -12,7 +13,7 @@ const BlackFridayBanner = () => {
       </h1>
 
       <p className="text-xl sm:text-2xl font-medium mb-8 text-zinc-200">
-        Desapego do Felipe
+        {appName}
       </p>
 
 

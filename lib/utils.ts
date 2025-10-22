@@ -11,4 +11,4 @@ export const activeBanner = {
   component: BlackFridayBanner
 };
 
-export const appName = "NextShop";
+export const appName = "KimKabum Store";
