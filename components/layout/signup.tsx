@@ -1,13 +1,16 @@
 import { DuplicateEntryError } from "@/core/Errors/error";
 import { userRepository } from "@/lib";
-import { Label } from "@radix-ui/react-label";
-import { Loader2, Lock, LogIn, Mail, PersonStanding } from "lucide-react";
+import { Loader2, LogIn } from "lucide-react";
 
+import { SignupSchema, SignupValidator } from '@/validators/signup.validator';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
-import React, { useState } from "react";
+import { useState } from "react";
+import { useForm } from 'react-hook-form';
 import { Alert, AlertDescription } from "../ui/alert";
 import { Button } from "../ui/button";
 import { CardContent, CardFooter } from "../ui/card";
+import { Form, FormField, FormItem, FormLabel, FormMessage } from '../ui/form';
 import { Input } from "../ui/input";
 
 
@@ -17,21 +20,21 @@ const SignUp = () => {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const router = useRouter()
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const router = useRouter();
+
+  const handleSubmit = async (e: SignupValidator) => {
     setLoading(true);
     setError(null);
     const uuid = crypto.randomUUID();
     try {
       await userRepository.addUser({
-        email,
-        password,
-        name,
+        email: e.email,
+        password: e.password,
+        name: e.name,
         id: uuid,
       });
-      localStorage.setItem('user:data', JSON.stringify({ email, name, id: uuid }));
-      router.replace('/products')
+      localStorage.setItem('user:data', JSON.stringify({ email: e.email, name: e.name, id: uuid }));
+      router.replace('/products');
     } catch (error) {
       if (
         error instanceof DuplicateEntryError
@@ -39,108 +42,89 @@ const SignUp = () => {
         setError(error.message);
         return;
       }
-      console.log(error)
+      console.log(error);
     } finally {
       setLoading(false);
     }
   };
+
+  const form = useForm({
+    resolver: zodResolver(SignupSchema)
+  });
   return (
-    <form onSubmit={handleSubmit}>
-      <CardContent className="space-y-4">
-        {error && (
-          <Alert variant="destructive">
-            <AlertDescription>{error}</AlertDescription>
-          </Alert>
-        )}
-
-        <div className="space-y-2">
-          <Label htmlFor="name">Name</Label>
-          <div className="relative">
-            <PersonStanding className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
-            <Input
-              id="name"
-              type="text"
-              placeholder="Seu nome"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              className="pl-10"
-              required
-              disabled={loading}
-            />
-          </div>
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="email">Email</Label>
-          <div className="relative">
-            <Mail className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
-            <Input
-              id="email"
-              type="email"
-              placeholder="seu@email.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="pl-10"
-              required
-              disabled={loading}
-            />
-          </div>
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="email">Email</Label>
-          <div className="relative">
-            <Mail className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
-            <Input
-              id="email"
-              type="email"
-              placeholder="seu@email.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="pl-10"
-              required
-              disabled={loading}
-            />
-          </div>
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="password">Senha</Label>
-          <div className="relative">
-            <Lock className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
-            <Input
-              id="password"
-              type="password"
-              placeholder="••••••••"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="pl-10"
-              required
-              disabled={loading}
-            />
-          </div>
-        </div>
-      </CardContent>
-      <CardFooter className="flex flex-col space-y-4 mt-4">
-        <Button
-          type="submit"
-          className="w-full bg-linear-to-r from-blue-600 to-purple-700 hover:from-blue-700 hover:to-purple-800 transition-colors"
-          disabled={loading}
-        >
-          {loading ? (
-            <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Cadastrando...
-            </>
-          ) : (
-            <>
-              <LogIn className="mr-2 h-4 w-4" />
-              Continuar
-            </>
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(handleSubmit)} className="max-w-md w-full mx-auto bg-white p-8 rounded-lg shadow-md">
+        <CardContent className="space-y-4">
+          {error && (
+            <Alert variant="destructive">
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
           )}
-        </Button>
-      </CardFooter>
-    </form>
-  );
-}
 
-export default SignUp
+          <div className="space-y-2">
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Nome</FormLabel>
+                  <Input placeholder="Seu nome" {...field} />
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Email</FormLabel>
+                  <Input placeholder="seu@email.com" {...field} />
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <FormField
+              control={form.control}
+              name="password"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Senha</FormLabel>
+                  <Input placeholder="••••••••" {...field} />
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+        </CardContent>
+        <CardFooter className="flex flex-col space-y-4 mt-4">
+          <Button
+            type="submit"
+            className="w-full bg-linear-to-r from-blue-600 to-purple-700 hover:from-blue-700 hover:to-purple-800 transition-colors"
+            disabled={loading}
+          >
+            {loading ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Cadastrando...
+              </>
+            ) : (
+              <>
+                <LogIn className="mr-2 h-4 w-4" />
+                Continuar
+              </>
+            )}
+          </Button>
+        </CardFooter>
+      </form>
+    </Form>
+  );
+};
+
+export default SignUp;

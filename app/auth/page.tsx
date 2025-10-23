@@ -3,7 +3,7 @@
 import Login from '@/components/layout/login';
 import SignUp from '@/components/layout/signup';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader } from '@/components/ui/card';
 import { LogIn } from 'lucide-react';
 import { redirect } from 'next/navigation';
 import { useLayoutEffect, useState } from 'react';
@@ -41,7 +41,6 @@ const Auth = () => {
 
         <Card className="border-0 shadow-xl">
           <CardHeader className="space-y-1">
-            <CardTitle className="text-2xl font-bold text-center">{mode === 'login' ? 'Login' : 'Sign Up'}</CardTitle>
             <CardDescription className='text-center'>
               {mode === 'login' ? 'Entre com suas credenciais abaixo.' : 'Preencha o formulário para criar uma conta.'}
             </CardDescription>
