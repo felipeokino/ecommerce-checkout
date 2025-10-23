@@ -1,9 +1,11 @@
 'use client';
+import LogoImage from '@/assets//logo.png';
 import { useCart } from '@/hooks/useCart';
 import { useUser } from '@/hooks/useUser';
 import { orderScheduler } from '@/lib';
 import { appName, cn } from '@/lib/utils';
 import { LogOut, Mail, Search, ShoppingCart, User } from 'lucide-react';
+import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import { Badge } from '../ui/badge';
@@ -11,7 +13,6 @@ import { Button } from '../ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
 import { ScrollArea } from '../ui/scroll-area';
 import { Separator } from '../ui/separator';
-
 
 
 const Header = () => {
@@ -42,7 +43,7 @@ const Header = () => {
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
         <div className="flex items-center gap-8">
           <a href="/" className="flex items-center gap-2 transition-opacity hover:opacity-80">
-            <ShoppingCart className="h-7 w-7 text-zinc-900" />
+            <Image src={LogoImage} alt="Logo" className="h-8 w-8" width={28} height={28} />
             <span className="text-xl font-bold text-zinc-900">{appName}</span>
           </a>
 
