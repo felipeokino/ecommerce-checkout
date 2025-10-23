@@ -25,7 +25,6 @@ export class OrderScheduler {
   async loadOrders(userId: string) {
     if (!userId) return;
     await orderRepository.getPendingOrders(userId).then(orders => {
-      console.log(`Carregados ${orders.length} pedidos pendentes para agendamento.`);
       orders.forEach(order => {
         const isCompleted = Math.random() < 0.5;
 
